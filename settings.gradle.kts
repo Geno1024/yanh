@@ -5,3 +5,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Yanh"
+
+include(":swdb:star")
