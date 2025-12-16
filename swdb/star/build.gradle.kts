@@ -24,10 +24,10 @@ val jar = tasks.register("jarCount") {
 }
 
 tasks.withType<JavaCompile> {
-    dependsOn(runCount)
+    dependsOn(run)
 }
 
 tasks.withType<Jar> {
-    dependsOn(jarCount)
+    dependsOn(jar)
 }
 // </editor-fold>
