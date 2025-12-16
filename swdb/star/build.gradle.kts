@@ -14,20 +14,20 @@ val runCount = tasks.register("runCount") {
     }
 }
 
-val jarCount = BuildCount(project, "jar")
+val jar = BuildCount(project, "jar")
 
-val jar = tasks.register("jarCount") {
+val jarCount = tasks.register("jarCount") {
     group = "buildCount"
     doLast {
-        jarCount.inc()
+        jar.inc()
     }
 }
 
 tasks.withType<JavaCompile> {
-    dependsOn(run)
+    dependsOn(runCount)
 }
 
 tasks.withType<Jar> {
-    dependsOn(jar)
+    dependsOn(jarCount)
 }
 // </editor-fold>
