@@ -1,4 +1,4 @@
-name: Dependency Submission
+name: dependency-submission
 on:
   push:
     branches:
