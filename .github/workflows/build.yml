@@ -21,9 +21,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v5.0.0
       - name: Build with Gradle Wrapper
         run: ./gradlew build
+      - name: Merge Artifacts
+        run: |
+          mkdir artifacts
+          cp **/*.jar artifacts
+          rm artifacts/buildSrc.jar artifacts/gradle-wrapper.jar
       - name: Upload Artifact
         uses: actions/upload-artifact@v6.0.0
         with:
-          path: |
-            **/*.jar
-            !**/buildSrc.jar
+          path: artifacts
