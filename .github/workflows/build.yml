@@ -26,6 +26,7 @@ jobs:
           mkdir artifacts
           cp **/*.jar artifacts
           rm artifacts/buildSrc.jar artifacts/gradle-wrapper.jar
+          ls artifacts
       - name: Upload Artifact
         uses: actions/upload-artifact@v6.0.0
         with:
