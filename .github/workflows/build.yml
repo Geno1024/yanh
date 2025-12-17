@@ -24,7 +24,7 @@ jobs:
       - name: Merge Artifacts
         run: |
           mkdir artifacts
-          cp **/*.jar artifacts
+          find . -name "*.jar" -exec cp {} artifacts \;
           rm artifacts/buildSrc.jar artifacts/gradle-wrapper.jar
           ls artifacts
       - name: Upload Artifact
