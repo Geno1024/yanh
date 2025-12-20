@@ -1,33 +1,19 @@
-import g.buildsrc.BuildCount
+import g.buildsrc.CountTask
 
 plugins {
     kotlin("jvm")
 }
 
-// <editor-fold desc="Build Count">
-val run = BuildCount(project, "run")
-
-val runCount: TaskProvider<Task> = tasks.register("runCount") {
-    group = "buildCount"
-    doLast {
-        run.inc()
-    }
-}
-
-val jar = BuildCount(project, "jar")
-
-val jarCount: TaskProvider<Task> = tasks.register("jarCount") {
-    group = "buildCount"
-    doLast {
-        jar.inc()
-    }
-}
+val runCountTask by tasks.register<CountTask.RunCountTask>("runCount")
+val packCountTask by tasks.register<CountTask.PackCountTask>("packCount")
 
 tasks.withType<JavaCompile> {
-    dependsOn(runCount)
+    dependsOn(runCountTask)
 }
 
 tasks.withType<Jar> {
-    dependsOn(jarCount)
+    dependsOn(packCountTask)
 }
-// </editor-fold>
+
+group = "g.sw.simpledb"
+version = "0.0.${packCountTask.count}.${runCountTask.count}"
