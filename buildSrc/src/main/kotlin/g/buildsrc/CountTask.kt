@@ -2,6 +2,7 @@ package g.buildsrc
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
@@ -13,7 +14,7 @@ abstract class CountTask(key: String) : DefaultTask()
         outputs.upToDateWhen { false }
     }
 
-    @Internal
+    @OutputFile
     val file: File = project.file("$key-count.txt")
 
     @Internal
