@@ -15,6 +15,7 @@ tasks.withType<JavaCompile> {
 
 tasks.withType<Jar> {
     dependsOn(packCountTask)
+    dependsOn(tasks.getByName("kotlinSourcesJar"))
     manifest {
         attributes(
             Attributes.Name.MANIFEST_VERSION.toString() to "1.0",
