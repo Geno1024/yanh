@@ -25,7 +25,8 @@ jobs:
         run: ./gradlew build --build-cache --configuration-cache
       - name: Merge Artifacts
         run: |
-          mkdir full pure
+          mkdir full
+          mkdir pure
           find . -name "*.jar" -exec cp {} full \;
           rm full/buildSrc.jar full/gradle-wrapper.jar
           find full -name "*.jar" ! -name "*-sources.jar" ! -name "*-htmldoc.jar" ! -name "*-javadoc.jar" -exec cp {} pure \;
