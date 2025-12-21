@@ -30,7 +30,7 @@ jobs:
           find . -name "*.jar" -exec cp {} full \;
           rm full/buildSrc.jar full/gradle-wrapper.jar
           find full -name "*.jar" ! -name "*-sources.jar" ! -name "*-htmldoc.jar" ! -name "*-javadoc.jar" -exec cp {} pure \;
-          for f in pure/*; do echo ${f} ${f%-*}.jar; mv ${f} ${f%-*}.jar; done
+          for f in pure/*; do mv ${f} ${f%-*}.jar; done
           echo "Full:"
           ls full
           echo "Pure:"
