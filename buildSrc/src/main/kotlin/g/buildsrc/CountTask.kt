@@ -6,7 +6,7 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-abstract class CountTask(key: String) : DefaultTask()
+abstract class CountTask(@get:Input key: String) : DefaultTask()
 {
     init
     {
