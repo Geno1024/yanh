@@ -31,9 +31,13 @@ jobs:
           find full -name "*.jar" ! -name "*-sources.jar" ! -name "*-htmldoc.jar" ! -name "*-javadoc.jar" -exec cp {} pure \;
           for f in pure/*; do mv ${f} ${f%-*}.jar; done
           echo "Full:"
-          find full -exec stat --printf '%n\t%s\n' {} \;
+          cd full
+          stat --printf '%n\t%s\n' *
+          cd ..
           echo "Pure:"
-          find pure -exec stat --printf '%n\t%s\n' {} \;
+          cd pure
+          stat --printf '%n\t%s\n' *
+          cd ..
       - name: Upload Full Artifact
         uses: actions/upload-artifact@v6.0.0
         with:
