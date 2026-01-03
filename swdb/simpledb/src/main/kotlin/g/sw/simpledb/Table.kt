@@ -1,28 +1,48 @@
 package g.sw.simpledb
 
 import java.io.RandomAccessFile
+import kotlin.reflect.KClass
 
-class Table<T : Line>(val line: Class<T>, val fileNamePrefix: String = line.simpleName?:"ANONYMOUS")
+/**
+ * A [g.sw.simpledb.Table] in [g.sw.simpledb] contains 3 files:
+ * - Metadata, `[name].gsdb`
+ * - Index, `[name].gsdbi`
+ * - Pool, `[name].gsdbp`
+ *
+ * # Naming
+ * `gsdb` means Geno's Simple DataBase.
+ *
+ * # Data structure
+ * ## Metadata
+ *
+ */
+class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
 {
-    private val meta: RandomAccessFile = RandomAccessFile("$fileNamePrefix.gsdb", "rw")
-    private val bitmap: RandomAccessFile = RandomAccessFile("$fileNamePrefix-bitmap.gsdb", "rw")
-    private val pool: RandomAccessFile = RandomAccessFile("$fileNamePrefix-pool.gsdb", "rw")
+    constructor(lineDef: KClass<T>, name: String): this(lineDef.java, name)
 
+    private val metadata = RandomAccessFile("$name.gsdb", "rw")
+    private val index = RandomAccessFile("$name.gsdbi", "rw")
+    private val pool = RandomAccessFile("$name.gsdbp", "rw")
+
+    /**
+     * Create empty table.
+     */
     fun init(): Table<T> = apply {
-        meta.write("GSDB0001".toByteArray(Charsets.UTF_8))
-        meta.write(System.currentTimeMillis().toHexString(HexFormat.Default).padStart(8, '0').hexToByteArray())
-        val qn = line.canonicalName.toString().toByteArray()
-        meta.write(qn.size.toHexString().padStart(4, '0').hexToByteArray())
-        meta.write(qn)
-        bitmap.setLength(0)
+        metadata.write("gsdb0001".toByteArray())
+        metadata.write(System.currentTimeMillis().toHexString(HexFormat.Default).padStart(8, '0').hexToByteArray())
+        val qn = lineDef.canonicalName.toString().toByteArray()
+        metadata.write(qn.size.toHexString().padStart(4, '0').hexToByteArray())
+        metadata.write(qn)
+        index.setLength(0)
         pool.setLength(0)
     }
 
-    companion object
+    fun add(line: T)
     {
-        inline fun <reified T : Line> getDefaultTable(): Table<T> = Table(T::class.java, T::class.simpleName?:"ANONYMOUS")
-        inline fun <reified T : Line> getTable(fileNamePrefix: String): Table<T> = Table(T::class.java, fileNamePrefix)
+        index.seek(index.length())
+        pool.seek(pool.length())
+        index.writeLong(pool.filePointer)
+        pool.write(line.ser())
     }
 
-    override fun toString(): String = "Table<${line.canonicalName}>(${fileNamePrefix})"
 }

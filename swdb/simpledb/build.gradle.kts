@@ -8,6 +8,10 @@ plugins {
     id("org.jetbrains.dokka-javadoc")
 }
 
+dependencies {
+    implementation(kotlin("reflect"))
+}
+
 val runCountTask by tasks.register<CountTask.RunCountTask>("runCount")
 val packCountTask by tasks.register<CountTask.PackCountTask>("packCount")
 
