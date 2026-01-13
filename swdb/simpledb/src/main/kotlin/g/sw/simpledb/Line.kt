@@ -46,6 +46,24 @@ interface Line<T : Line<T>>
                         write(it.toInt() ushr 8)
                         write(it.toInt())
                     }
+                    is Float -> {
+                        val bits = it.toBits()
+                        write(bits ushr 24)
+                        write(bits ushr 16)
+                        write(bits ushr 8)
+                        write(bits)
+                    }
+                    is Double -> {
+                        val bits = it.toBits()
+                        write((bits ushr 56).toInt())
+                        write((bits ushr 48).toInt())
+                        write((bits ushr 40).toInt())
+                        write((bits ushr 32).toInt())
+                        write(bits.toInt() ushr 24)
+                        write(bits.toInt() ushr 16)
+                        write(bits.toInt() ushr 8)
+                        write(bits.toInt())
+                    }
                     is String -> {
                         val length = it.length
                         write(length ushr 24)
