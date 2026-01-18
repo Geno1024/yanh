@@ -14,8 +14,14 @@ import kotlin.reflect.KClass
  * # Naming
  * `gsdb` means Geno's Simple DataBase.
  *
+ * This database writes everything immediately in harddisk file, without any log,
+ *
  * # Data structure
  * ## Metadata
+ *
+ * ## Index
+ *
+ * ## Pool
  *
  */
 class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
