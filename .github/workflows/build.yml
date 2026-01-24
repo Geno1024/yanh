@@ -25,7 +25,7 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
       - name: Build with Gradle Wrapper
-        run: ./gradlew build --build-cache --configuration-cache
+        run: ./gradlew build check --build-cache --configuration-cache
       - name: Generate Kover HTML Report
         run: ./gradlew koverHtmlReport
       - name: Merge Artifacts
@@ -56,7 +56,8 @@ jobs:
       - name: Merge Pages
         run: | 
           mkdir pages
-          mv ./build/reports/kover/html/ ./pages/reports
+          mv ./build/reports/kover/html/ ./pages/kover
+          mv ./build/reports/tests/test/ ./pages/result
       - name: Upload Pages
         uses: actions/upload-pages-artifact@v4.0.0
         with:
