@@ -45,6 +45,9 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
         poolFile.setLength(0)
     }
 
+    /**
+     * Add a [line] to end of table.
+     */
     fun add(line: T) = apply {
         indexFile.seek(indexFile.length())
         poolFile.seek(poolFile.length())
@@ -54,6 +57,9 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
         poolFile.write(ser)
     }
 
+    /**
+     * Remove last line from table.
+     */
     fun removeLast() = apply {
         indexFile.seek(indexFile.length() - 8)
         val lastPtr = indexFile.readLong()
@@ -63,6 +69,9 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
         poolFile.setLength(lastPtr + lastLength)
     }
 
+    /**
+     * Remove line [index] from table.
+     */
     fun remove(index: Long) = apply {
         if (index == indexFile.length() / 8 - 1) {
             removeLast()
@@ -118,6 +127,9 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
         }
     }
 
+    /**
+     * Get line [index] from table.
+     */
     operator fun get(index: Long): T
     {
         if (index >= indexFile.length() / 8) throw IndexOutOfBoundsException("Reading index $index with db size ${indexFile.length() / 8}.")
@@ -134,6 +146,9 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
         add(line)
     }
 
+    /**
+     * Set last line of table to [value].
+     */
     fun setLast(value: T): Table<T> = apply {
         indexFile.seek(indexFile.length() - 8)
         poolFile.seek(indexFile.readLong())
@@ -142,6 +157,9 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
         poolFile.write(ser)
     }
 
+    /**
+     * Set line [index] of table to [value].
+     */
     operator fun set(index: Long, value: T): Table<T> = apply {
         if (index == indexFile.length() / 8 - 1) {
             setLast(value)
@@ -198,6 +216,9 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
         }
     }
 
+    /**
+     * Search all lines satisfying [criteria].
+     */
     fun search(criteria: (T) -> Boolean): List<T> = (0 until indexFile.length() / 8)
         .map(::get)
         .filter(criteria)
