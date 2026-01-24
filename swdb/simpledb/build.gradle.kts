@@ -10,6 +10,7 @@ plugins {
 
 dependencies {
     implementation(kotlin("reflect"))
+    testImplementation(kotlin("test"))
 }
 
 val runCountTask by tasks.register<CountTask.RunCountTask>("runCount")
@@ -50,4 +51,8 @@ version = "0.0.${packCountTask.count}.${runCountTask.count}"
 
 application {
     mainClass = "g.sw.SimpleDB"
+}
+
+testing {
+
 }
