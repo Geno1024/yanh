@@ -54,31 +54,68 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
         poolFile.write(ser)
     }
 
-    fun remove(vararg index: Long) = apply {
-        val tempIndexFile = RandomAccessFile("$name.gsdbit", "rw")
-        val tempPoolFile = RandomAccessFile("$name.gsdbpt", "rw")
-        LongRange(0, indexFile.length() / 8)
-            .filterNot { it !in index }
-            .forEach {
-                tempIndexFile.writeLong(tempPoolFile.filePointer)
-                indexFile.seek(it * 8)
-                val thiz = indexFile.readLong()
-                tempPoolFile.seek(thiz)
-                poolFile.seek(thiz)
-                val size = poolFile.readInt()
-                val buffer = ByteArray(size)
-                poolFile.read(buffer)
-                tempPoolFile.writeInt(size)
-                tempPoolFile.write(buffer)
+    fun removeLast() = apply {
+        indexFile.seek(indexFile.length() - 8)
+        val lastPtr = indexFile.readLong()
+        indexFile.setLength(indexFile.length() - 8)
+        poolFile.seek(lastPtr)
+        val lastLength = poolFile.readInt()
+        poolFile.setLength(lastPtr + lastLength)
+    }
+
+    fun remove(index: Long) = apply {
+        if (index == indexFile.length() / 8 - 1) {
+            removeLast()
+        } else {
+            val tempIndexFile = RandomAccessFile("$name.gsdbit", "rw")
+            val tempPoolFile = RandomAccessFile("$name.gsdbpt", "rw")
+            // Which one should remove?
+            indexFile.seek(index * 8L)
+            val removeIndexPtr = indexFile.readLong()
+            // Where is it?
+            poolFile.seek(removeIndexPtr)
+            val removeLength = poolFile.readInt()
+            // Keep the remaining of pool to temp pool.
+            poolFile.seek(removeIndexPtr + removeLength)
+            val buffer = ByteArray(4096)
+            while (true)
+            {
+                val length = poolFile.read(buffer)
+                if (length == -1) break
+                tempPoolFile.write(buffer, 0, length)
             }
-        tempIndexFile.close()
-        tempPoolFile.close()
-        indexFile.close()
-        poolFile.close()
-        File("$name.gsdbit").renameTo(File("$name.gsdbi"))
-        File("$name.gsdbpt").renameTo(File("$name.gsdbp"))
-        indexFile = RandomAccessFile("$name.gsdbi", "rw")
-        poolFile = RandomAccessFile("$name.gsdbp", "rw")
+            // Write back from temp pool to pool, starting from where to remove.
+            poolFile.seek(removeIndexPtr)
+            tempPoolFile.seek(0)
+            while (true)
+            {
+                val length = tempPoolFile.read(buffer)
+                if (length == -1) break
+                poolFile.write(buffer, 0, length)
+            }
+            // Keep the remaining of index to temp index.
+            indexFile.seek((index + 1) * 8L)
+            while (true)
+            {
+                val newIndex = indexFile.readLong() - removeLength
+                tempIndexFile.writeLong(newIndex)
+                if (indexFile.filePointer == indexFile.length()) break
+            }
+            // Write back from temp index to index, starting from where to move.
+            indexFile.seek(index * 8L)
+            tempIndexFile.seek(0)
+            while (true)
+            {
+                val length = tempIndexFile.read(buffer)
+                if (length == -1) break
+                indexFile.write(buffer, 0, length)
+            }
+            // Post cleaning.
+            tempPoolFile.close()
+            tempIndexFile.close()
+            File("$name.gsdbpt").delete()
+            File("$name.gsdbit").delete()
+        }
     }
 
     operator fun get(index: Long): T
@@ -96,4 +133,65 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
         add(line)
     }
 
+    fun setLast(value: T): Table<T> = apply {
+        indexFile.seek(indexFile.length() - 8)
+        poolFile.seek(indexFile.readLong())
+        val ser = value.ser()
+        poolFile.writeInt(ser.size)
+        poolFile.write(ser)
+    }
+
+    operator fun set(index: Long, value: T): Table<T> = apply {
+        if (index == indexFile.length() / 8 - 1) {
+            setLast(value)
+        } else {
+            val ser = value.ser()
+            val serLength = ser.size
+            indexFile.seek(index * 8L)
+            val setPoolPos = indexFile.readLong()
+            poolFile.seek(setPoolPos)
+            val toSetPoolLength = poolFile.readInt()
+            if (toSetPoolLength == serLength) {
+                poolFile.seek(setPoolPos + 4)
+                poolFile.write(ser)
+            } else {
+                val tempIndexFile = RandomAccessFile("$name.gsdbit", "rw")
+                val tempPoolFile = RandomAccessFile("$name.gsdbpt", "rw")
+                tempPoolFile.write(ser)
+                val nextPoolPos = indexFile.readLong()
+                poolFile.seek(nextPoolPos)
+                val buffer = ByteArray(4096)
+                while (true) {
+                    val length = poolFile.read(buffer)
+                    if (length == -1) break
+                    tempPoolFile.write(buffer, 0, length)
+                }
+                poolFile.seek(setPoolPos)
+                while (true) {
+                    val length = tempPoolFile.read(buffer)
+                    if (length == -1) break
+                    poolFile.write(buffer, 0, length)
+                }
+                indexFile.seek((index + 1) * 8L)
+                val diff = serLength - toSetPoolLength
+                while (true) {
+                    val newIndex = indexFile.readLong() + diff
+                    tempIndexFile.writeLong(newIndex)
+                    if (indexFile.filePointer == indexFile.length()) break
+                }
+                indexFile.seek((index + 1) * 8L)
+                tempIndexFile.seek(0)
+                while (true)
+                {
+                    val length = tempIndexFile.read(buffer)
+                    if (length == -1) break
+                    indexFile.write(buffer, 0, length)
+                }
+                tempPoolFile.close()
+                tempIndexFile.close()
+                File("$name.gsdbpt").delete()
+                File("$name.gsdbit").delete()
+            }
+        }
+    }
 }
