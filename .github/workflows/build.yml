@@ -56,6 +56,9 @@ jobs:
       - name: Upload Kover Report
         uses: actions/upload-pages-artifact@v4.0.0
         with:
-          path: "./build/reports/kover/"
+          path: "./build/reports/kover/html/"
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4.0.0
