@@ -4,6 +4,7 @@ import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class TableTest
 {
@@ -23,6 +24,46 @@ class TableTest
         assertEquals(0, table[0].age, "table[0].age")
         assertEquals("User1", table[1].name, "table[1].name")
         assertEquals(1, table[1].age, "table[1].age")
+    }
+
+    @Test
+    fun testDelete()
+    {
+        val table = Table(User::class, "delete-test")
+        table.init()
+        table.add(User("User0", 0))
+        table.add(User("User1", 1))
+        table.add(User("User2", 2))
+        table.removeLast()
+        assertFailsWith(IndexOutOfBoundsException::class) {
+            table[2]
+        }
+        table.remove(0)
+        assertEquals("User1", table[0].name, "table[0].name")
+        assertEquals(1, table[0].age, "table[0].age")
+    }
+
+    @Test
+    fun testModify()
+    {
+        val table = Table(User::class, "modify-test")
+        table.init()
+        table.add(User("User0", 0))
+        table.add(User("User1", 1))
+        table.add(User("User2", 2))
+        table.add(User("User3", 3))
+        table.add(User("User4", 4))
+        table[2] = User("User6", 50)
+        assertEquals("User6", table[2].name, "table[2].name")
+        assertEquals(50, table[2].age, "table[2].age")
+        assertEquals("User3", table[3].name, "table[3].age")
+        assertEquals(3, table[3].age, "table[3].age")
+
+        table[2] = User("User611", 50)
+        assertEquals("User611", table[2].name, "table[2].name")
+        assertEquals(50, table[2].age, "table[2].age")
+        assertEquals("User3", table[3].name, "table[3].age")
+        assertEquals(3, table[3].age, "table[3].age")
     }
 
     @AfterTest

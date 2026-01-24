@@ -120,6 +120,7 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
 
     operator fun get(index: Long): T
     {
+        if (index >= indexFile.length() / 8) throw IndexOutOfBoundsException("Reading index $index with db size ${indexFile.length() / 8}.")
         indexFile.seek(index * 8)
         val thiz = indexFile.readLong()
         poolFile.seek(thiz)
@@ -157,6 +158,7 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
             } else {
                 val tempIndexFile = RandomAccessFile("$name.gsdbit", "rw")
                 val tempPoolFile = RandomAccessFile("$name.gsdbpt", "rw")
+                tempPoolFile.writeInt(ser.size)
                 tempPoolFile.write(ser)
                 val nextPoolPos = indexFile.readLong()
                 poolFile.seek(nextPoolPos)
@@ -167,6 +169,7 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
                     tempPoolFile.write(buffer, 0, length)
                 }
                 poolFile.seek(setPoolPos)
+                tempPoolFile.seek(0)
                 while (true) {
                     val length = tempPoolFile.read(buffer)
                     if (length == -1) break

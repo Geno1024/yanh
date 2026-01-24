@@ -22,6 +22,7 @@ interface Line<T : Line<T>>
             .withIndex()
             .sortedBy { it.value.findAnnotation<Sequence>()?.value ?:(it.index * 10) }
             .map { (_, value) ->
+                @Suppress("UNCHECKED_CAST")
                 (value as KProperty1<Line<T>, *>).get(this@Line)
             }
             .forEach {
