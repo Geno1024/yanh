@@ -6,6 +6,7 @@ plugins {
     application
     id("org.jetbrains.dokka")
     id("org.jetbrains.dokka-javadoc")
+    id("org.jetbrains.kotlinx.kover")
 }
 
 dependencies {
