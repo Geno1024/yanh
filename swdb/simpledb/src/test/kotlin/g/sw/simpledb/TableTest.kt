@@ -3,6 +3,7 @@ package g.sw.simpledb
 import java.io.File
 import kotlin.test.AfterTest
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
@@ -64,6 +65,27 @@ class TableTest
         assertEquals(50, table[2].age, "table[2].age")
         assertEquals("User3", table[3].name, "table[3].age")
         assertEquals(3, table[3].age, "table[3].age")
+    }
+
+    @Test
+    fun testSearch()
+    {
+        val table = Table(User::class, "search-test")
+        table.init()
+        table.add(User("User0", 0))
+        table.add(User("User1", 1))
+        table.add(User("User2", 2))
+        table.add(User("User3", 1))
+        assertContentEquals(
+            listOf(User("User1", 1), User("User3", 1)),
+            table.search { it.age == 1 },
+            "table[?].age == 1"
+        )
+        assertContentEquals(
+            listOf(),
+            table.search { it.age == 3 },
+            "table[?].age == 3"
+        )
     }
 
     @AfterTest

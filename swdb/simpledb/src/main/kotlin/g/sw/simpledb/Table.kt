@@ -197,4 +197,8 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
             }
         }
     }
+
+    fun search(criteria: (T) -> Boolean): List<T> = (0 until indexFile.length() / 8)
+        .map(::get)
+        .filter(criteria)
 }
