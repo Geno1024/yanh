@@ -53,13 +53,17 @@ jobs:
         with:
           name: "Pure"
           path: pure
-      - name: Upload Kover Report
+      - name: Merge Pages
+        run: | 
+          mkdir pages
+          mv ./build/reports/kover/html/ ./pages/reports
+      - name: Upload Pages
         uses: actions/upload-pages-artifact@v4.0.0
         with:
-          path: "./build/reports/kover/html/"
-  deploy:
+          path: "./pages"
+  publish:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Deploy to GitHub Pages
+      - name: publish to GitHub Pages
         uses: actions/deploy-pages@v4.0.0
