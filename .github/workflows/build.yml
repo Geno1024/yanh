@@ -6,6 +6,8 @@ on:
   pull_request:
     branches:
       - "master"
+permissions:
+  pages: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,6 +25,8 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
       - name: Build with Gradle Wrapper
         run: ./gradlew build --build-cache --configuration-cache
+      - name: Generate Kover HTML Report
+        run: ./gradlew koverHtmlReport
       - name: Merge Artifacts
         run: |
           mkdir full pure
@@ -48,3 +52,9 @@ jobs:
         with:
           name: "Pure"
           path: pure
+      - name: Upload Kover Report
+        uses: actions/upload-pages-artifact@v4.0.0
+        with:
+          path: "./build/reports/kover/"
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4.0.0
