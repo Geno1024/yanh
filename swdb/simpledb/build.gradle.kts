@@ -41,7 +41,8 @@ tasks.named<Jar>("jar") {
         attributes(
             Attributes.Name.MANIFEST_VERSION.toString() to "1.0",
             Attributes.Name.MAIN_CLASS.toString() to application.mainClass,
-            Attributes.Name.IMPLEMENTATION_VENDOR.toString() to "Geno1024"
+            Attributes.Name.IMPLEMENTATION_VENDOR.toString() to "Geno1024",
+            Attributes.Name.IMPLEMENTATION_VERSION.toString() to version
         )
     }
     finalizedBy(dokkaJavadocJar, dokkaHtmlJar)
