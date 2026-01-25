@@ -53,7 +53,3 @@ version = "0.0.${packCountTask.count}.${runCountTask.count}"
 application {
     mainClass = "g.sw.SimpleDB"
 }
-
-testing {
-
-}

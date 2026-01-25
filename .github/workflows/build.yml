@@ -35,19 +35,19 @@ jobs:
         run: ./gradlew koverHtmlReport
       - name: Merge Artifacts
         run: |
-          mkdir full pure
+          mkdir full
           find . -name "*.jar" -exec cp {} full \;
           rm full/buildSrc.jar full/gradle-wrapper.jar
-          find full -name "*.jar" ! -name "*-sources.jar" ! -name "*-htmldoc.jar" ! -name "*-javadoc.jar" -exec cp {} pure \;
-          for f in pure/*; do mv ${f} ${f%-*}.jar; done
+          find full -name "*.jar" ! -name "*-sources.jar" ! -name "*-htmldoc.jar" ! -name "*-javadoc.jar" -exec cp {} pages/jars/ \;
+          for f in pages/jars/*; do mv ${f} ${f%-*}.jar; done
           echo "Full:"
           cd full
           stat --printf '%n\t%s\n' *
-          cd ..
+          cd -
           echo "Pure:"
-          cd pure
+          cd pages/jars
           stat --printf '%n\t%s\n' *
-          cd ..
+          cd -
       - name: Upload Full Artifact
         uses: actions/upload-artifact@v6.0.0
         with:
@@ -57,7 +57,7 @@ jobs:
         uses: actions/upload-artifact@v6.0.0
         with:
           name: "Pure"
-          path: pure
+          path: pages/jars
       - name: Merge Pages
         run: | 
           mkdir ./pages/test/
