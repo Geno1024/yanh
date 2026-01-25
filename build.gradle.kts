@@ -37,7 +37,7 @@ tasks.register("generateDownloadPagesForGitHubPages") {
                     <tr><th>Name</th><th>Size</th><th>Version</th></tr>
                 </thead>
                 <tbody>
-                    ${File("./pages/full").listFiles().map {
+                    ${File("$rootDir/pages/full").listFiles().map {
                         "<tr><td>$it</td><td></td><td></td>"
                     }}
                 </tbody>
