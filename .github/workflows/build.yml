@@ -24,12 +24,10 @@ jobs:
         uses: gradle/actions/setup-gradle@v5.0.0
         with:
           cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
-      - name: Build with Gradle Wrapper
+      - name: Build Jar, Docs, Test with Gradle Wrapper
         run: |
-          ./gradlew build check dokkaGenerate --build-cache --configuration-cache
+          ./gradlew build check dokkaGenerate koverHtmlReport --build-cache --configuration-cache
           mv ./build/dokka ./pages/docs
-      - name: Generate Kover HTML Report
-        run: ./gradlew koverHtmlReport
       - name: Merge Artifacts
         run: |
           mkdir full
