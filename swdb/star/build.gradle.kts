@@ -3,9 +3,10 @@ import java.util.jar.Attributes
 
 plugins {
     kotlin("jvm")
+    application
     id("org.jetbrains.dokka")
     id("org.jetbrains.dokka-javadoc")
-    application
+    id("org.jetbrains.kotlinx.kover")
 }
 
 val runCountTask by tasks.register<CountTask.RunCountTask>("runCount")
