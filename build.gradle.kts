@@ -37,14 +37,25 @@ tasks.register("generateDownloadPagesForGitHubPages") {
             <body>
             <table style="width: 100%">
                 <thead>
-                    <tr><th>Name</th><th>Size</th><th>Version</th></tr>
+                    <tr>
+                        <th>Name</th>
+                        <th>Size</th>
+                        <th>Version</th>
+                    </tr>
                 </thead>
                 <tbody>
                     ${File("$rootDir/pages/jars").listFiles {
                         it.extension == "jar"            
                     }.joinToString(separator = "\n") {
-                        """<tr><td><a href="jars/${it.name}">${it.name}</a></td><td>${it.length()}</td><td>${JarFile(it).manifest.getAttributes(
-                            Attributes.Name.IMPLEMENTATION_VERSION.toString())}</td></tr>"""
+            println(it)
+            println("   Manifest = ${JarFile(it).manifest}")
+            println("   MainAttributes = ${JarFile(it).manifest.mainAttributes}")
+            println("   Version = ${JarFile(it).manifest.getAttributes(Attributes.Name.IMPLEMENTATION_VERSION.toString())}")
+                        """<tr>
+                            |   <td><a href="jars/${it.name}">${it.name}</a></td>
+                            |   <td>${it.length()}</td>
+                            |   <td>${JarFile(it).manifest.getAttributes(Attributes.Name.IMPLEMENTATION_VERSION.toString())}</td>
+                            |</tr>""".trimMargin()
                     }}
                 </tbody>
             </table>
