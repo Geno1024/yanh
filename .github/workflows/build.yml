@@ -57,11 +57,16 @@ jobs:
         with:
           name: "Pure"
           path: pages/jars
+      - name: Generate Download Page
+        run: |
+          list=$(ls -l pages/jars/*.jar | awk '{print "        <tr><td>"$9"</td><td>"$5"</td><td></td></tr>"}')
+          sed -i 's/<$list template$>/'"$list"'/g' pages/download.html
       - name: Merge Pages
         run: | 
           mkdir ./pages/test/
           mv ./build/reports/kover/html/ ./pages/test/coverage
           mv ./build/reports/tests/test/aggregated-results ./pages/test/result
+          ls -alF ./pages/jars/
       - name: Upload Pages
         uses: actions/upload-pages-artifact@v4.0.0
         with:
