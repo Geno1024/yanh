@@ -38,7 +38,7 @@ tasks.register("generateDownloadPagesForGitHubPages") {
                 </thead>
                 <tbody>
                     ${File("$rootDir/pages/jars").listFiles().joinToString(separator = "\n") {
-                        "<tr><td>$it</td><td>${it.length()}</td><td></td></tr>"
+                        "<tr><td>${it.name}</td><td>${it.length()}</td><td></td></tr>"
                     }}
                 </tbody>
             </table>
