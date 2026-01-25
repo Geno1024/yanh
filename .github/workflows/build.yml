@@ -55,12 +55,9 @@ jobs:
           path: pages/jars
       - name: Generate Download Page
         run: |
-          cd pages/jars
-          list=$(ls -l *.jar | awk '{print "<tr><td>"$9"</td><td>"$5"</td><td></td></tr>"}')
-          cd -
-          sed -i 's@<$list template$>@'"$(echo -n $list | tr '\n' '\\n')"'@g' pages/download.html
+          ./gradlew generateDownloadPagesForGitHubPages
       - name: Merge Pages
-        run: | 
+        run: |
           mkdir ./pages/test/
           mv ./build/reports/kover/html/ ./pages/test/coverage
           mv ./build/reports/tests/test/aggregated-results ./pages/test/result
