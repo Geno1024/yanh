@@ -21,7 +21,7 @@ tasks.check {
     dependsOn(tasks.named<TestReport>("testAggregateTestReport"))
 }
 
-tasks.register<Exec>("generateDownloadPagesForGitHubPages") {
+tasks.register("generateDownloadPagesForGitHubPages") {
     doLast {
         File("$rootDir/pages/download.html").writeText("""
             <!doctype html>
