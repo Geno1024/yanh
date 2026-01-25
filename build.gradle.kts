@@ -49,7 +49,7 @@ tasks.register("generateDownloadPagesForGitHubPages") {
                     }.joinToString(separator = "\n") {
             println(it)
             println("   Manifest = ${JarFile(it).manifest}")
-            println("   MainAttributes = ${JarFile(it).manifest.mainAttributes}")
+            println("   MainAttributes = ${JarFile(it).manifest.mainAttributes.toList()}")
             println("   Version = ${JarFile(it).manifest.getAttributes(Attributes.Name.IMPLEMENTATION_VERSION.toString())}")
                         """<tr>
                             |   <td><a href="jars/${it.name}">${it.name}</a></td>
