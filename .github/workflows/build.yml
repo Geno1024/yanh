@@ -36,7 +36,7 @@ jobs:
         run: |
           mkdir full
           find . -name "*.jar" -exec cp {} full \;
-          rm full/buildSrc.jar full/gradle-wrapper.jar
+          rm full/buildSrc.jar full/gradle-wrapper.jar full/kover-jvm-agent.jar
           find full -name "*.jar" ! -name "*-sources.jar" ! -name "*-htmldoc.jar" ! -name "*-javadoc.jar" -exec cp {} pages/jars/ \;
           for f in pages/jars/*; do mv ${f} ${f%-*}.jar; done
           echo "Full:"
@@ -59,8 +59,8 @@ jobs:
           path: pages/jars
       - name: Generate Download Page
         run: |
-          list=$(ls -l pages/jars/*.jar | awk '{print "        <tr><td>"$9"</td><td>"$5"</td><td></td></tr>"}')
-          echo "$list"
+          cd pages/jars
+          list=$(ls -l *.jar | awk '{print "        <tr><td>"$9"</td><td>"$5"</td><td></td></tr>"}' | tr '\n' '\\n')
           sed -i 's@<$list template$>@'"$list"'@g' pages/download.html
       - name: Merge Pages
         run: | 
