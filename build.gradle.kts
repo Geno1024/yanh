@@ -1,3 +1,6 @@
+import java.util.jar.Attributes
+import java.util.jar.JarFile
+
 plugins {
     kotlin("jvm") version "2.3.0"
     id("org.jetbrains.dokka") version "2.1.0"
@@ -40,7 +43,8 @@ tasks.register("generateDownloadPagesForGitHubPages") {
                     ${File("$rootDir/pages/jars").listFiles {
                         it.extension == "jar"            
                     }.joinToString(separator = "\n") {
-                        """<tr><td><a href="jars/${it.name}">${it.name}</a></td><td>${it.length()}</td><td></td></tr>"""
+                        """<tr><td><a href="jars/${it.name}">${it.name}</a></td><td>${it.length()}</td><td>${JarFile(it).manifest.getAttributes(
+                            Attributes.Name.IMPLEMENTATION_VERSION.toString())}</td></tr>"""
                     }}
                 </tbody>
             </table>
