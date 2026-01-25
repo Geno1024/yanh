@@ -1,3 +1,4 @@
+import java.time.LocalDateTime
 import java.util.jar.Attributes
 import java.util.jar.JarFile
 
@@ -54,6 +55,7 @@ tasks.register("generateDownloadPagesForGitHubPages") {
                     }}
             |    </tbody>
             |</table>
+            |<p>Generate time: ${LocalDateTime.now()}</p>
             |</body>
             |</html>
         """.trimMargin())
