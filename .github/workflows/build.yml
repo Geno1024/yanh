@@ -36,7 +36,7 @@ jobs:
         run: |
           mkdir full
           find . -name "*.jar" -exec cp {} full \;
-          rm full/buildSrc.jar full/gradle-wrapper.jar full/kover-jvm-agent.jar
+          rm full/buildSrc.jar full/gradle-wrapper.jar full/kover-jvm-agent-*.jar
           find full -name "*.jar" ! -name "*-sources.jar" ! -name "*-htmldoc.jar" ! -name "*-javadoc.jar" -exec cp {} pages/jars/ \;
           for f in pages/jars/*; do mv ${f} ${f%-*}.jar; done
           echo "Full:"
