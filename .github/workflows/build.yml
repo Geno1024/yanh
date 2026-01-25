@@ -60,7 +60,8 @@ jobs:
       - name: Generate Download Page
         run: |
           list=$(ls -l pages/jars/*.jar | awk '{print "        <tr><td>"$9"</td><td>"$5"</td><td></td></tr>"}')
-          sed -i 's/<$list template$>/'"$list"'/g' pages/download.html
+          echo "$list"
+          sed -i 's@<$list template$>@'"$list"'@g' pages/download.html
       - name: Merge Pages
         run: | 
           mkdir ./pages/test/
