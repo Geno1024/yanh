@@ -43,10 +43,10 @@ tasks.register("generateDownloadPagesForGitHubPages") {
             |        </tr>
             |    </thead>
             |    <tbody>
-                    ${File("$rootDir/pages/jars").listFiles {
+            |        ${File("$rootDir/pages/jars").listFiles {
                         it.extension == "jar"            
                     }.joinToString(separator = "\n") {
-                        """|        <tr>
+                        """<tr>
                             |            <td><a href="jars/${it.name}">${it.name}</a></td>
                             |            <td>${it.length()}</td>
                             |            <td>${JarFile(it).manifest.mainAttributes[Attributes.Name.IMPLEMENTATION_VERSION.toString()]}</td>
