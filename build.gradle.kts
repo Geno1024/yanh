@@ -49,7 +49,7 @@ tasks.register("generateDownloadPagesForGitHubPages") {
                         """<tr>
                             |            <td><a href="jars/${it.name}">${it.name}</a></td>
                             |            <td>${it.length()}</td>
-                            |            <td>${JarFile(it).manifest.mainAttributes[Attributes.Name.IMPLEMENTATION_VERSION.toString()]}</td>
+                            |            <td>${JarFile(it).manifest.mainAttributes[Attributes.Name.IMPLEMENTATION_VERSION]}</td>
                             |        </tr>""".trimMargin()
                     }}
             |    </tbody>
