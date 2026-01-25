@@ -24,6 +24,11 @@ jobs:
         uses: gradle/actions/setup-gradle@v5.0.0
         with:
           cache-encryption-key: ${{ secrets.GRADLE_CACHE_ENCRYPTION_KEY }}
+      - name: Build Docs
+        run: |
+          ./gradlew dokkaGenerate
+          mkdir pages
+          mv ./build/dokka ./pages/docs
       - name: Build with Gradle Wrapper
         run: ./gradlew build check --build-cache --configuration-cache
       - name: Generate Kover HTML Report
@@ -55,9 +60,9 @@ jobs:
           path: pure
       - name: Merge Pages
         run: | 
-          mkdir pages
-          mv ./build/reports/kover/html/ ./pages/test-coverage
-          mv ./build/reports/tests/test/aggregated-results ./pages/test-result
+          mkdir ./pages/test/
+          mv ./build/reports/kover/html/ ./pages/test/coverage
+          mv ./build/reports/tests/test/aggregated-results ./pages/test/result
       - name: Upload Pages
         uses: actions/upload-pages-artifact@v4.0.0
         with:
