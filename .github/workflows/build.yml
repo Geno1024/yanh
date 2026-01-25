@@ -56,7 +56,7 @@ jobs:
       - name: Generate Download Page
         run: |
           cd pages/jars
-          list=$(ls -l *.jar | awk '{print "        <tr><td>"$9"</td><td>"$5"</td><td></td></tr>"}' | tr '\n' '\\n')
+          list=$(ls -l *.jar | awk '{print "<tr><td>"$9"</td><td>"$5"</td><td></td></tr>"}')
           echo "$list"
           sed -i 's@<$list template$>@'"$list"'@g' pages/download.html
       - name: Merge Pages
