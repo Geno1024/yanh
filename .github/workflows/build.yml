@@ -57,8 +57,8 @@ jobs:
         run: |
           cd pages/jars
           list=$(ls -l *.jar | awk '{print "<tr><td>"$9"</td><td>"$5"</td><td></td></tr>"}')
-          echo "$list"
-          sed -i 's@<$list template$>@'"$list"'@g' pages/download.html
+          echo -n "$list"
+          sed -i 's@<$list template$>@'"$(echo -n $list | tr '\n' '\\n')"'@g' pages/download.html
       - name: Merge Pages
         run: | 
           mkdir ./pages/test/
