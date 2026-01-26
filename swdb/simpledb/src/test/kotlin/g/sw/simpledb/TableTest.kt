@@ -35,11 +35,15 @@ class TableTest
         table.add(User("User0", 0))
         table.add(User("User1", 1))
         table.add(User("User2", 2))
+        table.add(User("User3", 3))
         table.removeLast()
         assertFailsWith(IndexOutOfBoundsException::class) {
-            table[2]
+            table[3]
         }
         table.remove(0)
+        assertEquals("User1", table[0].name, "table[0].name")
+        assertEquals(1, table[0].age, "table[0].age")
+        table.remove(1)
         assertEquals("User1", table[0].name, "table[0].name")
         assertEquals(1, table[0].age, "table[0].age")
     }
