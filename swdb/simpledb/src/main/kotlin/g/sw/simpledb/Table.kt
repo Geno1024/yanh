@@ -36,7 +36,7 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
      * Create empty table.
      */
     fun init(): Table<T> = apply {
-        metadataFile.write("gsdb0001".toByteArray())
+        metadataFile.write("gsdb0001".toByteArray(Charsets.US_ASCII))
         metadataFile.write(System.currentTimeMillis().toHexString(HexFormat.Default).padStart(8, '0').hexToByteArray())
         val qn = lineDef.canonicalName.toString().toByteArray()
         metadataFile.write(qn.size.toHexString().padStart(4, '0').hexToByteArray())
@@ -102,6 +102,7 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
                 if (length == -1) break
                 poolFile.write(buffer, 0, length)
             }
+            poolFile.setLength(poolFile.filePointer)
             // Keep the remaining of index to temp index.
             indexFile.seek((index + 1) * 8L)
             while (true)
@@ -119,6 +120,7 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
                 if (length == -1) break
                 indexFile.write(buffer, 0, length)
             }
+            indexFile.setLength(indexFile.filePointer)
             // Post cleaning.
             tempPoolFile.close()
             tempIndexFile.close()
@@ -193,6 +195,7 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
                     if (length == -1) break
                     poolFile.write(buffer, 0, length)
                 }
+                poolFile.setLength(poolFile.filePointer)
                 indexFile.seek((index + 1) * 8L)
                 val diff = serLength - toSetPoolLength
                 while (true) {

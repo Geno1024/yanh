@@ -70,12 +70,13 @@ interface Line<T : Line<T>>
                         write(bits.toInt())
                     }
                     is String -> {
-                        val length = it.length
+                        val bytes = it.toByteArray(Charsets.UTF_8)
+                        val length = bytes.size
                         write(length ushr 24)
                         write(length ushr 16)
                         write(length ushr 8)
                         write(length)
-                        write(it.toByteArray(Charsets.UTF_8))
+                        write(bytes)
                     }
                 }
             }
@@ -144,6 +145,7 @@ interface Line<T : Line<T>>
                         buf.toString(Charsets.UTF_8)
                     }
                     else -> {
+                        throw IllegalArgumentException("Unsupported type: ${parameter.type.jvmErasure}")
                     }
                 }
             }.let {
@@ -152,9 +154,5 @@ interface Line<T : Line<T>>
 
         inline fun <reified T : Line<T>> deser(bais: ByteArrayInputStream): T = deser(T::class, bais)
 
-        fun <T : Line<T>> read(raf: RandomAccessFile): Line<T>
-        {
-            return object : Line<T>{}
-        }
     }
 }
