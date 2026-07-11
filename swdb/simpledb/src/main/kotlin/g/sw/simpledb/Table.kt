@@ -24,13 +24,13 @@ import kotlin.reflect.KClass
  * ## Pool
  *
  */
-class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
+class Table<T: Line<T>>(val lineDef: Class<T>, val name: String) : AutoCloseable
 {
     constructor(lineDef: KClass<T>, name: String): this(lineDef.java, name)
 
     private val metadataFile = RandomAccessFile("$name.gsdb", "rw")
-    private var indexFile = RandomAccessFile("$name.gsdbi", "rw")
-    private var poolFile = RandomAccessFile("$name.gsdbp", "rw")
+    private val indexFile = RandomAccessFile("$name.gsdbi", "rw")
+    private val poolFile = RandomAccessFile("$name.gsdbp", "rw")
 
     /**
      * Create empty table.
@@ -38,7 +38,7 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
     fun init(): Table<T> = apply {
         metadataFile.write("gsdb0001".toByteArray(Charsets.US_ASCII))
         metadataFile.write(System.currentTimeMillis().toHexString(HexFormat.Default).padStart(8, '0').hexToByteArray())
-        val qn = lineDef.canonicalName.toString().toByteArray()
+        val qn = lineDef.canonicalName.toString().toByteArray(Charsets.US_ASCII)
         metadataFile.write(qn.size.toHexString().padStart(4, '0').hexToByteArray())
         metadataFile.write(qn)
         indexFile.setLength(0)
@@ -222,7 +222,26 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String)
     /**
      * Search all lines satisfying [criteria].
      */
-    fun search(criteria: (T) -> Boolean): List<T> = (0 until indexFile.length() / 8)
-        .map(::get)
-        .filter(criteria)
+    fun search(criteria: (T) -> Boolean): List<T> {
+        val count = indexFile.length() / 8
+        if (count == 0L) return emptyList()
+        indexFile.seek(0)
+        val pointers = LongArray(count.toInt()) { indexFile.readLong() }
+        val result = mutableListOf<T>()
+        for (ptr in pointers) {
+            poolFile.seek(ptr)
+            val size = poolFile.readInt()
+            val data = ByteArray(size)
+            poolFile.read(data)
+            val item = Line.deser(lineDef.kotlin, ByteArrayInputStream(data))
+            if (criteria(item)) result.add(item)
+        }
+        return result
+    }
+
+    override fun close() {
+        metadataFile.close()
+        indexFile.close()
+        poolFile.close()
+    }
 }
