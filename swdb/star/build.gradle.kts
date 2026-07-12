@@ -9,6 +9,12 @@ plugins {
     id("org.jetbrains.kotlinx.kover")
 }
 
+dependencies {
+    implementation(kotlin("reflect"))
+    implementation("org.apache.sshd:sshd-core:2.12.1")
+    testImplementation(kotlin("test"))
+}
+
 val runCountTask by tasks.register<CountTask.RunCountTask>("runCount")
 val packCountTask by tasks.register<CountTask.PackCountTask>("packCount")
 
