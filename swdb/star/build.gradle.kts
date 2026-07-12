@@ -12,6 +12,7 @@ plugins {
 dependencies {
     implementation(kotlin("reflect"))
     implementation("org.apache.sshd:sshd-core:2.12.1")
+    implementation(project(":swdb:simpledb"))
     testImplementation(kotlin("test"))
 }
 

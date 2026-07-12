@@ -41,8 +41,10 @@ class StarHttpServer(
             val body = exchange.requestBody.readAllBytes().let { bytes ->
                 if (bytes.isEmpty()) null else bytes.toString(Charsets.UTF_8)
             }
+            val bodyParams = if (body != null) parseQuery(body) else emptyMap()
+            val allParams = if (bodyParams.isNotEmpty()) query + bodyParams else query
 
-            val result = dispatcher.dispatch(className, methodName, query, body)
+            val result = dispatcher.dispatch(className, methodName, allParams)
             respond(exchange, 200, result?.toString() ?: "")
         } catch (e: ClassNotFoundException) {
             respond(exchange, 404, "Class not found: ${e.message}")
@@ -51,7 +53,7 @@ class StarHttpServer(
         } catch (e: IllegalArgumentException) {
             respond(exchange, 400, e.message ?: "Bad request")
         } catch (e: Exception) {
-            respond(exchange, 500, "${e::class.simpleName}: ${e.message}")
+            respond(exchange, 500, "${e::class.simpleName}: ${e.cause?.message ?: e.message}")
         } finally {
             exchange.close()
         }

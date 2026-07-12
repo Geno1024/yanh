@@ -83,7 +83,7 @@ private class StarShell(private val dispatcher: Dispatcher) : Command {
                                 val result = dispatcher.dispatch(resolved, parsed.methodName, parsed.args)
                                 writer.write((result?.toString() ?: "ok") + "\r\n")
                             } catch (e: Exception) {
-                                writer.write("Error: ${e.message}\r\n")
+                                writer.write("Error: ${e.cause?.message ?: e.message}\r\n")
                             }
                             writer.flush()
                         }
@@ -128,7 +128,7 @@ private class StarCommand(
                 output!!.flush()
             }
         } catch (e: Exception) {
-            val text = "Error: ${e.message}\n"
+            val text = "Error: ${e.cause?.message ?: e.message}\n"
             output!!.write(text.toByteArray())
             output!!.flush()
         } finally {
