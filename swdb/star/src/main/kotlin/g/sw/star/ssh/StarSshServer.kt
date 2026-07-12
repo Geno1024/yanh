@@ -6,6 +6,7 @@ import org.apache.sshd.server.Environment
 import org.apache.sshd.server.ExitCallback
 import org.apache.sshd.server.SshServer
 import org.apache.sshd.server.auth.password.PasswordAuthenticator
+import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator
 import org.apache.sshd.server.channel.ChannelSession
 import org.apache.sshd.server.command.Command
 import org.apache.sshd.server.command.CommandFactory
@@ -13,6 +14,7 @@ import org.apache.sshd.server.shell.ShellFactory
 import java.io.InputStream
 import java.io.OutputStream
 import java.security.KeyPairGenerator
+import java.security.PublicKey
 
 class StarSshServer(
     private val port: Int = 2222,
@@ -27,6 +29,9 @@ class StarSshServer(
         server.passwordAuthenticator = PasswordAuthenticator { username, password, _ ->
             username == "star" && password == "star"
         }
+        server.publickeyAuthenticator = PublickeyAuthenticator { username, key, _ ->
+            verifyUserKey(username, key)
+        }
         server.shellFactory = ShellFactory { StarShell(dispatcher) }
         server.commandFactory = CommandFactory { _, cmd -> StarCommand(cmd, dispatcher) }
         server.start()
@@ -40,6 +45,16 @@ class StarSshServer(
     private fun kp() = KeyPairGenerator.getInstance("RSA").run {
         initialize(2048)
         generateKeyPair()
+    }
+
+    private fun verifyUserKey(username: String, key: PublicKey): Boolean {
+        return try {
+            val storedKey = dispatcher.dispatch("User", "getPasskey", mapOf("login" to username))
+            storedKey != null && storedKey.toString().isNotEmpty() &&
+                SshKeyUtils.keyEquals(storedKey.toString(), key)
+        } catch (_: Exception) {
+            false
+        }
     }
 }
 

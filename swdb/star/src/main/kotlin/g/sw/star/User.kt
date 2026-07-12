@@ -2,6 +2,7 @@ package g.sw.star
 
 import g.sw.simpledb.Table
 import g.sw.simpledb.lines.User as UserRecord
+import g.sw.star.ssh.SshKeyUtils
 import java.io.File
 import java.security.SecureRandom
 import java.util.Base64
@@ -23,8 +24,8 @@ class User {
         if (password.isBlank()) throw IllegalArgumentException("Password cannot be empty")
         if (name.isBlank()) throw IllegalArgumentException("Name cannot be empty")
 
-        val existing = table.search { it.login == login }
-        if (existing.isNotEmpty()) throw IllegalArgumentException("Login already exists: $login")
+        if (table.search { it.login == login }.isNotEmpty())
+            throw IllegalArgumentException("Login already exists: $login")
 
         val count = table.search { true }.size
         val user = UserRecord(count + 1, login, name, hashPassword(password), "", gender, birthday, "", "", System.currentTimeMillis())
@@ -37,13 +38,31 @@ class User {
         if (users.isEmpty()) throw IllegalArgumentException("User not found: $login")
 
         val user = users.first()
-        if (!verifyPassword(password, user.password)) {
+        if (!verifyPassword(password, user.password))
             throw IllegalArgumentException("Invalid password")
-        }
 
         val token = UUID.randomUUID().toString().replace("-", "")
         Session.tokens[token] = user.id
         return token
+    }
+
+    fun addKey(login: String, key: String): String {
+        val users = table.search { it.login == login }
+        if (users.isEmpty()) throw IllegalArgumentException("User not found: $login")
+
+        val parsed = SshKeyUtils.parsePublicKey(key)
+            ?: throw IllegalArgumentException("Invalid SSH public key format")
+
+        val user = users.first()
+        val updated = user.copy(passkey = key.trim())
+        table[users.indexOfFirst { it.id == user.id }.toLong()] = updated
+        return "ok"
+    }
+
+    fun getPasskey(login: String): String {
+        val users = table.search { it.login == login }
+        if (users.isEmpty()) return ""
+        return users.first().passkey
     }
 
     private fun hashPassword(password: String): String {
