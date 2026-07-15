@@ -228,7 +228,8 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String) : AutoCloseable
         indexFile.seek(0)
         val pointers = LongArray(count.toInt()) { indexFile.readLong() }
         val result = mutableListOf<T>()
-        for (ptr in pointers) {
+        for (i in pointers.indices) {
+            val ptr = pointers[i]
             poolFile.seek(ptr)
             val size = poolFile.readInt()
             val data = ByteArray(size)
@@ -237,6 +238,25 @@ class Table<T: Line<T>>(val lineDef: Class<T>, val name: String) : AutoCloseable
             if (criteria(item)) result.add(item)
         }
         return result
+    }
+
+    /**
+     * Find the first index of a line satisfying [criteria], or -1 if not found.
+     */
+    fun searchIndex(criteria: (T) -> Boolean): Long {
+        val count = indexFile.length() / 8
+        if (count == 0L) return -1L
+        indexFile.seek(0)
+        for (i in 0 until count) {
+            val ptr = indexFile.readLong()
+            poolFile.seek(ptr)
+            val size = poolFile.readInt()
+            val data = ByteArray(size)
+            poolFile.read(data)
+            val item = Line.deser(lineDef.kotlin, ByteArrayInputStream(data))
+            if (criteria(item)) return i
+        }
+        return -1L
     }
 
     override fun close() {

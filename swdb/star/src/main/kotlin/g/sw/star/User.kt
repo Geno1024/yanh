@@ -55,7 +55,9 @@ class User {
 
         val user = users.first()
         val updated = user.copy(passkey = key.trim())
-        table[users.indexOfFirst { it.id == user.id }.toLong()] = updated
+        val idx = table.searchIndex { it.id == user.id }
+        if (idx == -1L) throw IllegalArgumentException("User not found: $login")
+        table[idx] = updated
         return "ok"
     }
 
