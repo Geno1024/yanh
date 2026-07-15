@@ -1,3 +1,7 @@
 .gradle
 build
 gradle.properties
+allow-end-of-line =.idea/
+*.gsdb
+*.gsdbi
+*.gsdbp
