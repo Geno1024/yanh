@@ -10,5 +10,6 @@ data class Product(
     @property:Sequence(30) var barcode: String,
     @property:Sequence(40) var unit: String,
     @property:Sequence(50) var description: String,
-    @property:Sequence(60) var createTime: Long,
+    @property:Sequence(60) var expiryDays: Int,
+    @property:Sequence(70) var createTime: Long,
 ) : Line<Product>
