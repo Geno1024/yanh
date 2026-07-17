@@ -3,11 +3,13 @@ import java.util.jar.Attributes
 import java.util.jar.JarFile
 
 plugins {
-    kotlin("jvm") version "2.3.0"
+    kotlin("jvm") version "2.3.0" apply false
+    kotlin("android") version "2.3.0" apply false
     id("org.jetbrains.dokka") version "2.1.0"
     id("org.jetbrains.dokka-javadoc") version "2.1.0"
     id("org.jetbrains.kotlinx.kover") version "0.9.4"
     id("test-report-aggregation")
+    id("com.android.application") version "8.9.0" apply false
 }
 
 dependencies {
