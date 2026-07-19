@@ -32,8 +32,7 @@ class MainActivity : AppCompatActivity() {
         ActionBarDrawerToggle(this, drawer, toolbar, R.string.open_drawer, R.string.close_drawer)
             .also { drawer.addDrawerListener(it); it.syncState() }
 
-        featureManager = FeatureManager(this)
-        featureManager.loadPlugins()
+        featureManager = (application as StarApp).featureManager
         rebuildMenu()
 
         navigationView.setNavigationItemSelectedListener { item ->

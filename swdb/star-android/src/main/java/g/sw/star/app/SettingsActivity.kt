@@ -1,7 +1,11 @@
 package g.sw.star.app
 
 import android.os.Bundle
+import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.Switch
 import android.widget.TextView
@@ -12,16 +16,37 @@ import g.sw.star.app.plugin.FeatureManager
 class SettingsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_settings)
 
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        val root = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+
+        val toolbar = Toolbar(this)
+        toolbar.title = "Settings"
+        toolbar.setBackgroundColor(resources.getColor(android.R.color.darker_gray, null))
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        root.addView(toolbar)
+
+        val serverRow = LinearLayout(this).apply {
+            val edit = EditText(this@SettingsActivity).apply {
+                id = View.generateViewId()
+                setText((application as StarApp).serverUrl)
+                layoutParams = LinearLayout.LayoutParams(0, -2, 1f)
+            }
+            addView(edit)
+            addView(Button(this@SettingsActivity).apply {
+                text = "Save"
+                setOnClickListener {
+                    (application as StarApp).serverUrl = edit.text.toString()
+                }
+            })
+        }
+        root.addView(serverRow)
+
+        val listView = ListView(this)
+        root.addView(listView)
 
         val featureManager = FeatureManager(this)
         featureManager.loadPlugins()
-
-        val listView = findViewById<ListView>(R.id.feature_list)
         val features = featureManager.allFeatures()
 
         listView.adapter = object : ArrayAdapter<Any>(this, 0, features) {
@@ -37,6 +62,8 @@ class SettingsActivity : AppCompatActivity() {
                 return view
             }
         }
+
+        setContentView(root)
     }
 
     override fun onSupportNavigateUp(): Boolean {
