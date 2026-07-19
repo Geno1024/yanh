@@ -17,4 +17,4 @@ rootProject.name = "Yanh"
 
 include(":swdb:simpledb")
 include(":swdb:star")
-include(":swdb:star-android")
+include(":swdb:planet:android")
