@@ -2,6 +2,9 @@ package g.sw.star.http
 
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpServer
+import g.sw.simpledb.Table
+import g.sw.simpledb.lines.Attachment
+import java.io.File
 import java.net.InetSocketAddress
 import java.net.URLDecoder
 
@@ -27,6 +30,11 @@ class StarHttpServer(
             val path = exchange.requestURI.path.trim('/')
             if (path.isEmpty()) {
                 respond(exchange, 200, "Star - Family Server")
+                return
+            }
+
+            if (path.startsWith("Attachment/file/")) {
+                serveFile(exchange, path.removePrefix("Attachment/file/"))
                 return
             }
 
@@ -68,6 +76,26 @@ class StarHttpServer(
             val value = URLDecoder.decode(pair.substring(eq + 1), "UTF-8")
             key to value
         }.toMap()
+    }
+
+    private fun serveFile(exchange: HttpExchange, idStr: String) {
+        try {
+            val id = idStr.toInt()
+            val table = if (File("attachments.gsdb").exists())
+                Table(Attachment::class.java, "attachments") else return respond(exchange, 404, "No DB")
+            val idx = table.searchIndex { it.id == id }
+            if (idx == -1L) { respond(exchange, 404, "Attachment not found"); return }
+            val att = table[idx]
+            val file = File(att.filePath)
+            if (!file.exists()) { respond(exchange, 404, "File not found on disk"); return }
+            val bytes = file.readBytes()
+            exchange.responseHeaders.set("Content-Type", att.mimeType)
+            exchange.responseHeaders.set("Content-Disposition", "inline; filename=\"${att.fileName}\"")
+            exchange.sendResponseHeaders(200, bytes.size.toLong())
+            exchange.responseBody.write(bytes)
+        } catch (_: NumberFormatException) {
+            respond(exchange, 400, "Invalid ID")
+        }
     }
 
     private fun respond(exchange: HttpExchange, status: Int, body: String) {
