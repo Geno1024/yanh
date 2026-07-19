@@ -11,5 +11,6 @@ data class Product(
     @property:Sequence(40) var unit: String,
     @property:Sequence(50) var description: String,
     @property:Sequence(60) var expiryDays: Int,
-    @property:Sequence(70) var createTime: Long,
+    @property:Sequence(70) var categoryId: Int,
+    @property:Sequence(80) var createTime: Long,
 ) : Line<Product>

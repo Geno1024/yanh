@@ -19,10 +19,10 @@ class Product {
         return idx
     }
 
-    fun add(name: String, type: String = "", barcode: String = "", unit: String = "", description: String = "", expiryDays: Int = 0): String {
+    fun add(name: String, type: String = "", barcode: String = "", unit: String = "", description: String = "", expiryDays: Int = 0, categoryId: Int = 0): String {
         if (name.isBlank()) throw IllegalArgumentException("Name cannot be empty")
         val id = table.search { true }.size + 1
-        table.add(ProductRecord(id, name, type, barcode, unit, description, expiryDays, System.currentTimeMillis()))
+        table.add(ProductRecord(id, name, type, barcode, unit, description, expiryDays, categoryId, System.currentTimeMillis()))
         return "ok"
     }
 
@@ -39,7 +39,11 @@ class Product {
         return table.search { it.name.contains(keyword) || it.barcode.contains(keyword) }
     }
 
-    fun update(id: Int, name: String = "", type: String = "", barcode: String = "", unit: String = "", description: String = "", expiryDays: String = ""): String {
+    fun listByCategory(categoryId: Int): List<ProductRecord> {
+        return table.search { it.categoryId == categoryId }
+    }
+
+    fun update(id: Int, name: String = "", type: String = "", barcode: String = "", unit: String = "", description: String = "", expiryDays: String = "", categoryId: String = ""): String {
         val prod = get(id) ?: throw IllegalArgumentException("Product not found: $id")
         val updated = prod.copy(
             name = name.ifBlank { prod.name },
@@ -48,6 +52,7 @@ class Product {
             unit = unit.ifBlank { prod.unit },
             description = description.ifBlank { prod.description },
             expiryDays = expiryDays.ifBlank { prod.expiryDays.toString() }.toIntOrNull() ?: prod.expiryDays,
+            categoryId = categoryId.ifBlank { prod.categoryId.toString() }.toIntOrNull() ?: prod.categoryId,
         )
         table[index(id)] = updated
         return "ok"
