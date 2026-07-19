@@ -5,3 +5,5 @@ gradle.properties
 *.gsdb
 *.gsdbi
 *.gsdbp
+attachments/
+images/
