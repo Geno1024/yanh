@@ -13,18 +13,17 @@ class PriceHistory {
         }
     }
 
-    fun add(productId: Int, price: Double): String {
+    fun add(productId: Int, shopId: Int = 0, price: Double): String {
         val id = table.search { true }.size + 1
-        table.add(PriceHistoryRecord(id, productId, price, System.currentTimeMillis()))
+        table.add(PriceHistoryRecord(id, productId, shopId, price, System.currentTimeMillis()))
         return "ok"
     }
 
-    fun list(productId: Int): List<PriceHistoryRecord> {
-        return table.search { it.productId == productId }
+    fun list(productId: Int, shopId: Int = 0): List<PriceHistoryRecord> {
+        return table.search { it.productId == productId && it.shopId == shopId }
     }
 
-    fun latest(productId: Int): PriceHistoryRecord? {
-        val all = table.search { it.productId == productId }
-        return all.maxByOrNull { it.recordTime }
+    fun latest(productId: Int, shopId: Int = 0): PriceHistoryRecord? {
+        return table.search { it.productId == productId && it.shopId == shopId }.maxByOrNull { it.recordTime }
     }
 }
